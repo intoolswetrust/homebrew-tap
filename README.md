@@ -6,8 +6,12 @@ Homebrew formulae for [In Tools We Trust](https://github.com/intoolswetrust) pro
 
 ```shell
 brew tap intoolswetrust/tap
+brew trust --tap intoolswetrust/tap
 brew install jsignpdf
 ```
+
+Homebrew 5 refuses to load formulae from third-party taps until they are trusted,
+hence the `brew trust` step.
 
 ## Formulae
 
