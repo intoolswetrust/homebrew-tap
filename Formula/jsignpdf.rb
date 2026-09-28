@@ -1,8 +1,8 @@
 class Jsignpdf < Formula
   desc "Add digital signatures to PDF documents (GUI and CLI)"
   homepage "https://github.com/intoolswetrust/jsignpdf"
-  url "https://github.com/intoolswetrust/jsignpdf/releases/download/JSignPdf_3_2_0/jsignpdf-3.2.0-full.zip"
-  sha256 "7384e29bbf730af120cb36281cee73c8aa8c8bd155526f0eb7b1c44b629635bd"
+  url "https://github.com/intoolswetrust/jsignpdf/releases/download/JSignPdf_3_2_1/jsignpdf-3.2.1-full.zip"
+  sha256 "efe398221f04d5dc1632ebec989edf445e5b51c2cbea7893ec1b220ed1a2ffa3"
   license any_of: ["MPL-2.0", "LGPL-2.1-only"]
 
   livecheck do
