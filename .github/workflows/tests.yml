@@ -33,7 +33,7 @@ jobs:
       run: scripts/bump-jsignpdf.sh "$V" "$SHA"
 
     - name: Set up Homebrew
-      uses: Homebrew/actions/setup-homebrew@master
+      uses: Homebrew/actions/setup-homebrew@main
 
     - name: Tap this checkout
       run: |
