@@ -1,0 +1,35 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, macos-13, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Set up Homebrew
+      uses: Homebrew/actions/setup-homebrew@master
+
+    - name: Tap this checkout
+      run: |
+        set -euo pipefail
+        brew tap-new intoolswetrust/tap --no-git
+        cp -f Formula/*.rb "$(brew --repository intoolswetrust/tap)/Formula/"
+
+    - run: brew trust --tap intoolswetrust/tap
+
+    - run: brew audit --strict --online intoolswetrust/tap/jsignpdf
+
+    - run: brew install --verbose intoolswetrust/tap/jsignpdf
+
+    - run: brew test --verbose intoolswetrust/tap/jsignpdf
