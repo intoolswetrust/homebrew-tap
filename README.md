@@ -36,14 +36,12 @@ Native installers (MSI, DEB, RPM, DMG, Flatpak) are published on
 
 ## Updating a formula
 
-Formulae track final releases. To bump, edit the formula in this checkout and open a PR:
+Formulae track final releases. To bump, run the **Bump jsignpdf** workflow (Actions tab,
+optional version input; empty means the latest release). It updates the formula, runs the
+test matrix and pushes to `main` only if everything passes.
+
+Manually:
 
 ```shell
-V=3.3.0
-URL="https://github.com/intoolswetrust/jsignpdf/releases/download/JSignPdf_${V//./_}/jsignpdf-${V}-full.zip"
-SHA="$(curl -fsSL "$URL" | shasum -a 256 | cut -d' ' -f1)"
-sed -i.bak -E "s|^  url \".*\"|  url \"$URL\"|; s|^  sha256 \".*\"|  sha256 \"$SHA\"|" Formula/jsignpdf.rb && rm Formula/jsignpdf.rb.bak
+scripts/bump-jsignpdf.sh 3.3.0
 ```
-
-`brew bump-formula-pr` also works, but it needs `HOMEBREW_GITHUB_API_TOKEN` (or `gh auth login`)
-and edits the installed tap rather than this checkout.

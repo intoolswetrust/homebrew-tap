@@ -6,15 +6,18 @@ Homebrew tap `intoolswetrust/tap`. It currently holds one formula, `Formula/jsig
 ## Layout
 
 - `Formula/*.rb`: formulae
-- `.github/workflows/tests.yml`: CI (audit, install and test on macOS arm/x86 and Ubuntu)
-- `README.md`: user install steps and the version-bump recipe
+- `.github/workflows/tests.yml`: CI (audit, install and test on macOS arm/x86 and Ubuntu);
+  also reusable via `workflow_call`
+- `.github/workflows/bump.yml`: manual version bump; tests first, then pushes to `main`
+- `scripts/bump-jsignpdf.sh VERSION [SHA256]`: rewrites `url`/`sha256` in the formula
+- `README.md`: user install steps
 
 ## Rules
 
 - Track final JSignPdf releases only. Release tags look like `JSignPdf_3_2_0`, and the asset is
   `jsignpdf-<version>-full.zip`.
-- On a version bump, update `url` and `sha256` together. Get the checksum from the real asset;
-  never guess it.
+- Bump versions with `scripts/bump-jsignpdf.sh` so `url` and `sha256` change together and the
+  checksum comes from the real asset. Never guess it.
 - Keep the install pinned to `openjdk@21` via `Language::Java.overridable_java_home_env("21")`
   so users can override `JAVA_HOME`.
 - Keep the JavaFX pruning in `install` in sync with the classifiers upstream ships under

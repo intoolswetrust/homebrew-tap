@@ -1,0 +1,72 @@
+name: Bump jsignpdf
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "JSignPdf version, e.g. 3.3.0 (empty = latest release)"
+        required: false
+
+permissions:
+  contents: read
+
+concurrency: bump-jsignpdf
+
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.bump.outputs.version }}
+      sha256: ${{ steps.bump.outputs.sha256 }}
+      changed: ${{ steps.bump.outputs.changed }}
+    steps:
+    - uses: actions/checkout@v5
+
+    - id: bump
+      env:
+        GH_TOKEN: ${{ github.token }}
+        VERSION: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+        if [ -z "$VERSION" ]; then
+          VERSION="$(gh api repos/intoolswetrust/jsignpdf/releases/latest --jq .tag_name | sed 's/^JSignPdf_//; s/_/./g')"
+        fi
+        read -r _ V SHA < <(scripts/bump-jsignpdf.sh "$VERSION")
+        echo "version=$V" >> "$GITHUB_OUTPUT"
+        echo "sha256=$SHA" >> "$GITHUB_OUTPUT"
+        if git diff --quiet; then
+          echo "changed=false" >> "$GITHUB_OUTPUT"
+          echo "jsignpdf is already at $V" >> "$GITHUB_STEP_SUMMARY"
+        else
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+        fi
+
+  test:
+    needs: prepare
+    if: needs.prepare.outputs.changed == 'true'
+    uses: ./.github/workflows/tests.yml
+    with:
+      version: ${{ needs.prepare.outputs.version }}
+      sha256: ${{ needs.prepare.outputs.sha256 }}
+
+  commit:
+    needs: [prepare, test]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        ref: main
+
+    - env:
+        V: ${{ needs.prepare.outputs.version }}
+        SHA: ${{ needs.prepare.outputs.sha256 }}
+      run: |
+        set -euo pipefail
+        scripts/bump-jsignpdf.sh "$V" "$SHA"
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git commit -am "jsignpdf $V"
+        git push
+        echo "Bumped jsignpdf to $V" >> "$GITHUB_STEP_SUMMARY"
